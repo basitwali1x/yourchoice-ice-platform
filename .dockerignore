@@ -1,0 +1,16 @@
+.git
+node_modules
+**/node_modules
+__pycache__
+**/*.pyc
+.env
+*.db
+yci_sqlite.db
+frontend-admin/dist
+frontend-customer/dist
+frontend-staff/dist
+.vscode
+.github
+README.md
+FINAL_REPORT.md
+brain
