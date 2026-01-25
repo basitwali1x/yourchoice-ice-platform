@@ -44,7 +44,11 @@ def get_dashboard_metrics(dc_id: Optional[str] = None, db: Session = Depends(get
         active_routes = q_routes.count()
 
         # Hub Summary (Always Global or filtered if requested)
-        hubs = db.query(DistributionCenter).all()
+        hubs = db.query(DistributionCenter)
+        if dc_id:
+            hubs = hubs.filter(DistributionCenter.id == dc_id)
+        hubs = hubs.all()
+        
         hub_summary = []
         for h in hubs:
             h_count = db.query(Customer).filter(Customer.primary_dc_id == h.id).count()
@@ -69,6 +73,11 @@ def get_dashboard_metrics(dc_id: Optional[str] = None, db: Session = Depends(get
             proj = avg_rev * (1 + (random.random() * 0.4 - 0.1)) 
             heatmap.append({"date": d.strftime("%m/%d"), "revenue": round(proj, 2), "type": "projected"})
 
+        # KPIs
+        q_cust_count = db.query(Customer)
+        if dc_id:
+            q_cust_count = q_cust_count.filter(Customer.primary_dc_id == dc_id)
+
         return {
             "kpi": {
                 "daily_revenue": float(daily_rev) / 100.0,
@@ -76,7 +85,7 @@ def get_dashboard_metrics(dc_id: Optional[str] = None, db: Session = Depends(get
                 "monthly_revenue": float(monthly_rev) / 100.0,
                 "orders_pending": int(orders_pending),
                 "active_routes": int(active_routes),
-                "total_customers": db.query(Customer).count()
+                "total_customers": q_cust_count.count()
             },
             "hub_summary": hub_summary,
             "sales_heatmap": heatmap

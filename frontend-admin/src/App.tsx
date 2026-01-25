@@ -88,7 +88,8 @@ export default function App() {
     else { setLoading(false); return; }
 
     try {
-      const res = await fetch(`${API_URL}/${endpoint}`);
+      const url = selectedDC ? `${API_URL}/${endpoint}?dc_id=${selectedDC}` : `${API_URL}/${endpoint}`;
+      const res = await fetch(url);
       setItems(await res.json());
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
   }
@@ -315,7 +316,7 @@ export default function App() {
                 <div className="space-y-20">
                   <div className="grid md:grid-cols-4 gap-8">
                     <YCICard title="Total Partners" className="!p-10"><div className="text-7xl font-black text-white tracking-tighter italic">{data.kpi.total_customers}</div><div className="text-[10px] font-black text-yci-textMuted uppercase mt-5 tracking-[0.4em]">Global Network</div></YCICard>
-                    {data.hub_summary.map((h: any) => (
+                    {data.hub_summary.filter((h: any) => !selectedDC || h.id === selectedDC).map((h: any) => (
                       <YCICard key={h.id} title={`${h.name} Partners`} className="!p-10 transform transition hover:-translate-y-2 hover:border-yci-accent/20">
                         <div className="text-7xl font-black text-yci-accent tracking-tighter italic">{h.customer_count}</div>
                         <div className="text-[10px] font-black text-yci-textMuted uppercase mt-5 tracking-[0.4em]">Regional Segments</div>

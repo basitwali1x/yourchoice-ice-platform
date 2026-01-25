@@ -8,8 +8,11 @@ from typing import List
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
 @router.get("/", response_model=List[CustomerSchema])
-def get_customers(db: Session = Depends(get_db)):
-    return db.query(Customer).all()
+def get_customers(dc_id: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(Customer)
+    if dc_id:
+        query = query.filter(Customer.primary_dc_id == dc_id)
+    return query.all()
 
 @router.post("/", response_model=CustomerSchema)
 def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):

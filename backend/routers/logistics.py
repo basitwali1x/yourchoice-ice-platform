@@ -28,13 +28,13 @@ def get_logistics_status(db: Session = Depends(get_db)):
         })
     return stats
 @router.get("/deliveries")
-def get_deliveries(db: Session = Depends(get_db)):
+def get_deliveries(dc_id: Optional[str] = None, db: Session = Depends(get_db)):
     # Join Delivery -> RouteStop -> Route -> DC
     # Join RouteStop -> Location -> Customer
     results = []
     
     # Fetch all deliveries
-    deliveries = db.query(
+    query = db.query(
         models.Delivery, 
         models.RouteStop, 
         models.Route, 
@@ -43,8 +43,12 @@ def get_deliveries(db: Session = Depends(get_db)):
     ).join(models.RouteStop, models.Delivery.route_stop_id == models.RouteStop.id)\
      .join(models.Route, models.RouteStop.route_id == models.Route.id)\
      .join(models.Location, models.RouteStop.location_id == models.Location.id)\
-     .join(models.Customer, models.Location.customer_id == models.Customer.id)\
-     .all()
+     .join(models.Customer, models.Location.customer_id == models.Customer.id)
+    
+    if dc_id:
+        query = query.filter(models.Route.dc_id == dc_id)
+        
+    deliveries = query.all()
 
     for d, rs, r, c, l in deliveries:
         results.append({

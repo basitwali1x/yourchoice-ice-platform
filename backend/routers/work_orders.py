@@ -8,8 +8,11 @@ from uuid import UUID
 router = APIRouter(prefix="/work-orders", tags=["Work Orders"])
 
 @router.get("/", response_model=list[WorkOrderSchema])
-def get_work_orders(db: Session = Depends(get_db)):
-    return db.query(WorkOrder).all()
+def get_work_orders(dc_id: str = None, db: Session = Depends(get_db)):
+    query = db.query(WorkOrder)
+    if dc_id:
+        query = query.join(models.Location, WorkOrder.location_id == models.Location.id).filter(models.Location.primary_dc_id == dc_id)
+    return query.all()
 
 @router.post("/", response_model=WorkOrderSchema)
 def create_work_order(wo: WorkOrderCreate, db: Session = Depends(get_db)):
