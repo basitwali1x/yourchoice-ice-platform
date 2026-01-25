@@ -16,8 +16,11 @@ jobs:
       - name: Check Secret
         run: |
           if [ -z "${FLY_API_TOKEN}" ]; then
-            echo "Error: FLY_API_TOKEN is empty or not set in GitHub Secrets."
+            echo "❌ ERROR: FLY_API_TOKEN is empty or not set in GitHub Secrets."
             exit 1
+          else
+            echo "✅ SUCCESS: FLY_API_TOKEN is detected."
+            echo "Diagnostic: Secret length is ${#FLY_API_TOKEN} characters."
           fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
