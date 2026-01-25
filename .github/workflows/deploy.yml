@@ -16,4 +16,6 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only
+        run: |
+          flyctl apps create yci-platform-2026 --org personal || true
+          flyctl deploy --remote-only
