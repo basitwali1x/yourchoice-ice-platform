@@ -1,4 +1,4 @@
-app = "arctic-ice-api"
+app = "arctic-ice-solutions"
 primary_region = "iad"
 
 [build]
