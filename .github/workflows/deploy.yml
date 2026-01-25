@@ -11,11 +11,9 @@ jobs:
     name: Deploy App
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: superfly/flyctl-actions/setup-flyctl@v1
 
       - name: Deploy to Fly.io
-        run: |
-          flyctl apps create yci-platform-2026 --org personal || true
-          flyctl deploy --remote-only
+        run: flyctl deploy --remote-only --ha=false
