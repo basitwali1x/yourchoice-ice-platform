@@ -4,7 +4,7 @@ from database import get_db
 from models import DistributionCenter, Route, Customer, Delivery, RouteStop, Location
 import models
 from schemas import DistributionCenterSchema
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/logistics", tags=["Logistics"])
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Customer, Location, CustomerPrice
 from schemas import CustomerSchema, CustomerCreate, CustomerPriceBase
-from typing import List
+from typing import List, Optional
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 

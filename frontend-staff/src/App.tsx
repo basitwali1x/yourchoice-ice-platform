@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { YCICard, YCIButton, YCIInput } from "./components/yci/ui";
-import { login, getRoutes, submitDelivery, getDistributionCenters } from "./lib/api";
+import { login, getRoutes, submitDelivery, submitDriverDelivery, getDistributionCenters, getCustomers } from "./lib/api";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
@@ -11,6 +11,9 @@ export default function App() {
   const [dcs, setDcs] = useState<any[]>([]);
   const [activeDC, setActiveDC] = useState<any>(null);
 
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+
   // Login State
   const [email, setEmail] = useState("driver1@yci.local");
   const [password, setPassword] = useState("password");
@@ -19,8 +22,11 @@ export default function App() {
   const [dForm, setDForm] = useState({
     delivered_20lb_qty: 0,
     delivered_8lb_qty: 0,
-    payment: "cash",
+    payment: "credit",
     amount_cents: 0,
+    price_20lb: 2.00, // Default based on user
+    price_8lb: 1.00,
+    // tax_amount removed from manual input
   });
 
   useEffect(() => {
@@ -31,10 +37,20 @@ export default function App() {
 
   useEffect(() => {
     if (activeDC && token) {
-      setView("routes");
-      refreshRoutes();
+      // Don't auto-switch to routes, allow choice
+      // setView("routes"); 
+      // refreshRoutes();
+      loadCustomers();
     }
   }, [activeDC]);
+
+  const loadCustomers = async () => {
+    if (!activeDC) return;
+    try {
+      const data = await getCustomers(token!, activeDC.id);
+      setCustomers(data);
+    } catch (e) { console.error(e); }
+  }
 
   const loadDCs = async () => {
     try {
@@ -91,6 +107,26 @@ export default function App() {
     }
   };
 
+  const submitDriverForm = async () => {
+    if (!selectedCustomer) return;
+    try {
+      await submitDriverDelivery(token!, {
+        customer_id: selectedCustomer.id,
+        delivered_20lb_qty: dForm.delivered_20lb_qty,
+        delivered_8lb_qty: dForm.delivered_8lb_qty,
+        price_20lb: dForm.price_20lb,
+        price_8lb: dForm.price_8lb,
+        payment_method: dForm.payment
+      });
+      alert("Delivery Submitted & Weekly Order Saved!");
+      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0 });
+      setSelectedCustomer(null);
+      setView("choice_menu"); // Go back to choice
+    } catch (e) {
+      alert("Submission failed");
+    }
+  };
+
   /* VIEWS */
   if (view === "login") {
     return (
@@ -114,13 +150,69 @@ export default function App() {
         <YCICard title="Select Region" subtitle="Where are you executing today?">
           <div className="grid gap-3">
             {dcs.map(dc => (
-              <YCIButton key={dc.id} variant="secondary" onClick={() => setActiveDC(dc)}>
+              <YCIButton key={dc.id} variant="secondary" onClick={() => { setActiveDC(dc); setView("choice_menu"); }}>
                 {dc.name} <span className="text-xs opacity-70">({dc.type})</span>
               </YCIButton>
             ))}
             <div className="mt-4 border-t border-white/10 pt-4">
               <button onClick={() => { setToken(null); localStorage.removeItem("token"); setView("login"); }} className="w-full text-center text-sm text-yci-accent">Logout</button>
             </div>
+          </div>
+        </YCICard>
+      </div>
+    );
+  }
+
+  if (view === "choice_menu") {
+    return (
+      <div className="min-h-screen yci-frost-bg p-6 flex items-center justify-center">
+        <YCICard title="Driver Actions" subtitle={`Region: ${activeDC?.name}`}>
+          <div className="grid gap-4">
+            <YCIButton onClick={() => setView("submit_delivery")} className="!py-6 text-xl">🚚 New Delivery Order</YCIButton>
+            <YCIButton variant="secondary" onClick={() => { setView("routes"); refreshRoutes(); }}>🗺️ View Assigned Routes</YCIButton>
+            <YCIButton variant="ghost" onClick={() => setView("dc_select")}>Change Region</YCIButton>
+          </div>
+        </YCICard>
+      </div>
+    )
+  }
+
+  if (view === "submit_delivery") {
+    return (
+      <div className="min-h-screen yci-frost-bg p-4 overflow-y-auto">
+        <button onClick={() => setView("choice_menu")} className="mb-4 text-yci-accent font-bold">← Back</button>
+        <YCICard title="New Delivery" subtitle="Submit order & update schedule">
+          <div className="grid gap-4">
+            <div>
+              <label className="text-xs text-yci-textMuted uppercase mb-2 block">Select Customer</label>
+              <select className="w-full p-4 rounded-xl bg-yci-bg1/60 border border-white/10 text-white outline-none"
+                value={selectedCustomer?.id || ""}
+                onChange={(e) => setSelectedCustomer(customers.find(c => c.id === e.target.value))}>
+                <option value="">-- Choose Store --</option>
+                {customers.map(c => <option key={c.id} value={c.id}>{c.business_name}</option>)}
+              </select>
+            </div>
+
+            {selectedCustomer && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-[10px] text-yci-textMuted uppercase">20lb Bags</label><YCIInput type="number" value={dForm.delivered_20lb_qty} onChange={e => setDForm({ ...dForm, delivered_20lb_qty: Number(e.target.value) })} /></div>
+                  <div><label className="text-[10px] text-yci-textMuted uppercase">Price ($)</label><YCIInput type="number" value={dForm.price_20lb} onChange={e => setDForm({ ...dForm, price_20lb: Number(e.target.value) })} /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-[10px] text-yci-textMuted uppercase">8lb Bags</label><YCIInput type="number" value={dForm.delivered_8lb_qty} onChange={e => setDForm({ ...dForm, delivered_8lb_qty: Number(e.target.value) })} /></div>
+                  <div><label className="text-[10px] text-yci-textMuted uppercase">Price ($)</label><YCIInput type="number" value={dForm.price_8lb} onChange={e => setDForm({ ...dForm, price_8lb: Number(e.target.value) })} /></div>
+                </div>
+
+                <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-center">
+                  <div className="text-xs text-yci-textMuted uppercase">Estimated Total (w/ 10.75% Tax)</div>
+                  <div className="text-2xl font-black text-green-400">
+                    ${(((dForm.delivered_20lb_qty * dForm.price_20lb) + (dForm.delivered_8lb_qty * dForm.price_8lb)) * 1.1075).toFixed(2)}
+                  </div>
+                </div>
+                <YCIButton onClick={submitDriverForm} className="w-full py-4 text-lg">SUBMIT ORDER</YCIButton>
+              </div>
+            )}
           </div>
         </YCICard>
       </div>

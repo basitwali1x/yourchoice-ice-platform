@@ -82,6 +82,7 @@ class Customer(Base):
     locations = relationship("Location", back_populates="customer")
     orders = relationship("Order", back_populates="customer")
     custom_prices = relationship("CustomerPrice", back_populates="customer")
+    recurring_order = relationship("RecurringOrder", back_populates="customer", uselist=False)
 
 class CustomerPrice(Base):
     __tablename__ = "customer_prices"
@@ -194,3 +195,17 @@ class SystemSetting(Base):
     __tablename__ = "system_settings"
     key = Column(String, primary_key=True)
     value = Column(Text)
+
+class RecurringOrder(Base):
+    __tablename__ = "recurring_orders"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    customer_id = Column(String, ForeignKey("customers.id"), nullable=False)
+    frequency = Column(String, default="weekly") # weekly, bi-weekly
+    quantity_20lb = Column(Integer, default=0)
+    quantity_8lb = Column(Integer, default=0)
+    preferred_day = Column(String, default="Monday")
+    
+    customer = relationship("Customer", back_populates="recurring_order")
+
+# Add back_populate to Customer as well (checking Customer class)
+# Customer class is at line 70. I need to update it too.

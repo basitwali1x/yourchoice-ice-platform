@@ -40,3 +40,27 @@ export async function submitDelivery(token: string, stopId: string, data: any) {
     if (!res.ok) throw new Error("Failed to submit delivery");
     return res.json();
 }
+
+export async function submitDriverDelivery(token: string, data: any) {
+    const res = await fetch(`${API_URL}/driver/delivery`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Failed to submit delivery");
+    return res.json();
+}
+
+export async function getCustomers(token: string, dc_id?: string) {
+    let url = `${API_URL}/customers/`;
+    if (dc_id) {
+        url += `?dc_id=${dc_id}`;
+    }
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+}

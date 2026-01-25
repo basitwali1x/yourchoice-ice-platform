@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import WorkOrder
 from schemas import WorkOrderSchema, WorkOrderCreate
-from uuid import UUID
+from typing import List, Optional
 
 router = APIRouter(prefix="/work-orders", tags=["Work Orders"])
 
