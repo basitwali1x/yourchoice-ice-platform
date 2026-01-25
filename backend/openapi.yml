@@ -1,0 +1,296 @@
+openapi: 3.0.3
+info:
+  title: YCI (Your Choice Ice) API
+  version: 1.0.0
+servers:
+  - url: /api
+tags:
+  - name: Auth
+  - name: Customers
+  - name: Locations
+  - name: Products
+  - name: Orders
+  - name: Routes
+  - name: Deliveries
+  - name: WorkOrders
+  - name: Reports
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Role:
+      type: string
+      enum: [admin, manager, dispatcher, driver, technician, customer]
+
+    PaymentMethod:
+      type: string
+      enum: [cash, check, credit, charge]
+
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        role: { $ref: "#/components/schemas/Role" }
+        full_name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+
+    Customer:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        business_name: { type: string }
+        billing_email: { type: string }
+        billing_phone: { type: string }
+        billing_address: { type: string }
+        notes: { type: string }
+
+    Location:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        customer_id: { type: string, format: uuid }
+        location_name: { type: string }
+        address_line: { type: string }
+        city: { type: string }
+        state: { type: string }
+        zip: { type: string }
+        latitude: { type: number, format: double }
+        longitude: { type: number, format: double }
+        access_notes: { type: string }
+
+    Product:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        bag_size_lbs: { type: integer, enum: [8, 20] }
+        sku: { type: string }
+        base_price_cents: { type: integer }
+
+    OrderItem:
+      type: object
+      properties:
+        product_id: { type: string, format: uuid }
+        quantity: { type: integer }
+
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        customer_id: { type: string, format: uuid }
+        location_id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [draft, submitted, approved, assigned, delivered, cancelled]
+        requested_delivery_date: { type: string, format: date }
+        requested_window: { type: string }
+        notes: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderItem" }
+
+    RouteStop:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        route_id: { type: string, format: uuid }
+        location_id: { type: string, format: uuid }
+        order_id: { type: string, format: uuid }
+        stop_sequence: { type: integer }
+        status:
+          type: string
+          enum: [pending, arrived, completed, skipped]
+        planned_notes: { type: string }
+
+    Route:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        route_date: { type: string, format: date }
+        driver_id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [draft, published, in_progress, completed, cancelled]
+        title: { type: string }
+        notes: { type: string }
+        stops:
+          type: array
+          items: { $ref: "#/components/schemas/RouteStop" }
+
+    DeliveryCreate:
+      type: object
+      required: [route_stop_id, delivered_20lb_qty, delivered_8lb_qty, payment, amount_cents]
+      properties:
+        route_stop_id: { type: string, format: uuid }
+        delivered_20lb_qty: { type: integer }
+        delivered_8lb_qty: { type: integer }
+        payment: { $ref: "#/components/schemas/PaymentMethod" }
+        amount_cents: { type: integer }
+        check_number: { type: string }
+        card_last4: { type: string }
+        notes: { type: string }
+        photo_url: { type: string }
+        signature_url: { type: string }
+
+    WorkOrder:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        location_id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [open, assigned, in_progress, completed, cancelled]
+        priority: { type: integer }
+        issue_type: { type: string }
+        description: { type: string }
+        assigned_to: { type: string, format: uuid }
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: JWT tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+                  refresh_token: { type: string }
+
+  /customers:
+    get:
+      tags: [Customers]
+      responses:
+        "200":
+          description: list customers
+    post:
+      tags: [Customers]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Customer" }
+      responses:
+        "201": { description: created }
+
+  /locations:
+    get:
+      tags: [Locations]
+      responses:
+        "200": { description: list locations }
+    post:
+      tags: [Locations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Location" }
+      responses:
+        "201": { description: created }
+
+  /products:
+    get:
+      tags: [Products]
+      responses:
+        "200": { description: list products }
+
+  /orders:
+    get:
+      tags: [Orders]
+      responses:
+        "200": { description: list orders }
+    post:
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Order" }
+      responses:
+        "201": { description: created }
+
+  /routes:
+    get:
+      tags: [Routes]
+      responses:
+        "200": { description: list routes }
+    post:
+      tags: [Routes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Route" }
+      responses:
+        "201": { description: created }
+
+  /deliveries:
+    post:
+      tags: [Deliveries]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DeliveryCreate" }
+      responses:
+        "201": { description: delivery submitted }
+
+  /work-orders:
+    get:
+      tags: [WorkOrders]
+      responses:
+        "200": { description: list work orders }
+    post:
+      tags: [WorkOrders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WorkOrder" }
+      responses:
+        "201": { description: created }
+
+  /reports/daily:
+    get:
+      tags: [Reports]
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200": { description: daily totals }
+
+  /reports/driver-cash:
+    get:
+      tags: [Reports]
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200": { description: cash/check/credit totals by driver }

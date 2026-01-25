@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Outfit', Inter, system-ui, -apple-system, sans-serif;
+
+  /* YCI DESIGN SYSTEM TOKENS */
+  --bg-0: #0a0f12;
+  --bg-1: #121a1f;
+  --surface: #1c262d;
+  --card: #161e24;
+  --muted: #2d3b45;
+  --accent: #22d3ee;
+  --accent-2: #818cf8;
+  --text: #ffffff;
+  --text-muted: #8d9da7;
+  --glow: 0 0 20px rgba(34, 211, 238, 0.2);
+  --glow-strong: 0 0 35px rgba(34, 211, 238, 0.4);
+  --radius: 18px;
+
+  background-color: var(--bg-0);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+}
+
+.yci-frost-bg {
+  background: radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.05) 0%, transparent 50%),
+    var(--bg-0);
+}

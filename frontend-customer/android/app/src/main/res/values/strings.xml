@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">YCI Ice</string>
+    <string name="title_activity_main">YCI Ice</string>
+    <string name="package_name">com.yci.customer</string>
+    <string name="custom_url_scheme">com.yci.customer</string>
+</resources>

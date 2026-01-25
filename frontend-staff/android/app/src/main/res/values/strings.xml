@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">YCI Staff</string>
+    <string name="title_activity_main">YCI Staff</string>
+    <string name="package_name">com.yci.staff</string>
+    <string name="custom_url_scheme">com.yci.staff</string>
+</resources>

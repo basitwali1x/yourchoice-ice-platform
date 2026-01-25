@@ -1,0 +1,16 @@
+{
+    "name": "yci-platform",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm:dev:backend\" \"npm:dev:admin\" \"npm:dev:customer\" \"npm:dev:staff\"",
+        "dev:backend": "cd backend && py main.py",
+        "dev:admin": "cd frontend-admin && npm run dev",
+        "dev:customer": "cd frontend-customer && npm run dev",
+        "dev:staff": "cd frontend-staff && npm run dev",
+        "install:all": "npm install concurrently && cd frontend-admin && npm install && cd ../frontend-customer && npm install && cd ../frontend-staff && npm install"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

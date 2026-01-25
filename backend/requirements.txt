@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+sqlalchemy
+asyncpg
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+python-dotenv
+pandas
+openpyxl
+gspread
+requests
+requests-oauthlib
+PyJWT

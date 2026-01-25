@@ -1,0 +1,46 @@
+/* ==========================
+   YCI (YOUR CHOICE ICE) THEME
+   ========================== */
+
+:root {
+    --bg-0: #181e23;
+    --bg-1: #273b43;
+    --surface: #273b43;
+    --card: #334f59;
+    --muted: #4f656d;
+
+    --accent: #9bd4e4;
+    --accent-2: #8bbac8;
+
+    --text: #eff0ee;
+    --text-muted: #9ba1a1;
+
+    --ring: rgba(155, 212, 228, 0.55);
+    --glow: 0 0 24px rgba(155, 212, 228, 0.35);
+    --glow-strong: 0 0 36px rgba(155, 212, 228, 0.55);
+
+    --radius: 16px;
+}
+
+html,
+body {
+    background: var(--bg-0);
+    color: var(--text);
+}
+
+/* Frosted “premium ice” background effect */
+.yci-frost-bg {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at 15% 15%, rgba(155, 212, 228, .14), transparent 55%),
+        radial-gradient(circle at 85% 85%, rgba(155, 212, 228, .10), transparent 55%),
+        linear-gradient(180deg, rgba(39, 59, 67, .35), rgba(24, 30, 35, 1));
+}
+
+.yci-glow {
+    box-shadow: var(--glow);
+}
+
+.yci-glow-strong {
+    box-shadow: var(--glow-strong);
+}
