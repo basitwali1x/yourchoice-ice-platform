@@ -1,0 +1,47 @@
+OPTIMIZED LAKE CHARLES ROUTE (Driver Smitty)
+============================================================
+Stop 1: B & W - Jennings - 5585 Peterson St
+Stop 2: Big Easy Foods - 1075 Bennett Ave
+Stop 3: Brown & Root - 8722 Gray Ave
+Stop 4: Cajun Deli - 3434 Turner Ave
+Stop 5: Cajun Grocery - 2164 Watson St
+Stop 6: Cuccio's - 8526 Rodriguez St
+Stop 7: Daiquiri Shack - 6127 Mitchell Ave
+Stop 8: Delicious Donuts - 9622 Lopez Ave
+Stop 9: Delta Downs - Barn # 1 - Philip Calais - 9244 Park Ave
+Stop 10: Delta Downs - Barn # 2- Kenneth Weeks - 7511 Roberts St
+Stop 11: Delta Downs - Barn # 9 -  Darrel Soileau - 2266 Martin St
+Stop 12: Delta Downs - Barn #14 - Buddy Deville - 9758 Barnes Dr
+Stop 13: Delta Food #4-Sulphur - 8159 Anderson Ave
+Stop 14: Elton Dryer Inc - 2114 Brooks Ave
+Stop 15: Elton Express (formerly Tony's Mini Mart) - 7737 Madison Dr
+Stop 16: Feathers - 3355 Jackson St
+Stop 17: Gillis Food Mart - 9760 Cooper Rd
+Stop 18: Glenn's Mart-Vinton - 3257 Garcia Rd
+Stop 19: Hop-In - 3202 Walker St
+Stop 20: I-10 Rayne Chevron - 5275 Washington St
+Stop 21: Jones Grocery & Deli - 6770 Price St
+Stop 22: Kinder Quick Stop - 5444 Gonzalez Ave
+Stop 23: Kingspoint #4 - 5359 Harris Dr
+Stop 24: LC-Sasol North America-Alcohol Unit - 9336 Lewis Ave
+Stop 25: LC-Sasol North America-Emergency Response - 6998 Roosevelt Ave
+Stop 26: LC-Sasol North America-Ethylene - 7609 Thompson Ave
+Stop 27: LC-Sasol North America-Shop - 3875 Turner Ave
+Stop 28: M & K Pantry - 2852 Ross St
+Stop 29: Meaux Seafood (M&B) - 5469 Jenkins Dr
+Stop 30: Misses Grocery - 1913 Cook St
+Stop 31: Myer's Landing - 3801 Gray Ave
+Stop 32: Neighborhood Quick Mart - 6315 Parker Ave
+Stop 33: Podnas Quick Mart, LLC - 788 Second St
+Stop 34: S & W One Stop(Smitty's) - 1041 Torres Dr
+Stop 35: Starks Truck Stop (In & Out) - 4004 Brown Ave
+Stop 36: Sunshine Liquor Plus-Broad St. - 6563 Morris St
+Stop 37: Sunshine Liquor-Lake Charles - 6298 Cooper Rd
+Stop 38: Super Saver #4 - 6027 Nelson Dr
+Stop 39: System Services Broadband - 1731 Turner Ave
+Stop 40: TP's Grocery - 5317 Sanders Dr
+Stop 41: We Fair (EconoMart #9) - 2065 Bennett Ave
+Stop 42: Save N Go-Ryan ST - LC 4452 Ryan Street Lake Charles  LA 70605
+Stop 43: Smoke & Barrel - Inc. 418 Crestwood Street Lake Charles  LA 70605
+Stop 44: The Store - Inc-Sulphur 3558 Hwy 27 North Sulphur  LA 70663
+============================================================

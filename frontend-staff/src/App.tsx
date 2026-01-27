@@ -4,7 +4,7 @@ import { login, getRoutes, submitDelivery, submitDriverDelivery, getDistribution
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
-  const [view, setView] = useState("login"); // login, routes, stop
+  const [view, setView] = useState("login"); // login, routes, stop, submit_delivery, payment_select, receipt
   const [routes, setRoutes] = useState<any[]>([]);
   const [activeStop, setActiveStop] = useState<any>(null);
 
@@ -26,6 +26,7 @@ export default function App() {
     amount_cents: 0,
     price_20lb: 2.00, // Default based on user
     price_8lb: 1.00,
+    no_tax: false,  // Tax-exempt option
     // tax_amount removed from manual input
   });
 
@@ -107,23 +108,38 @@ export default function App() {
     }
   };
 
+  const [receipt, setReceipt] = useState<any>(null);
+
+  // Step 1: Go to payment selection
+  const proceedToPayment = () => {
+    if (!selectedCustomer) return;
+    if (dForm.delivered_20lb_qty === 0 && dForm.delivered_8lb_qty === 0) {
+      alert("Please enter at least one item quantity");
+      return;
+    }
+    setView("payment_select");
+  };
+
+  // Step 2: Final submission with payment method
   const submitDriverForm = async () => {
     if (!selectedCustomer) return;
     try {
-      await submitDriverDelivery(token!, {
+      const res = await submitDriverDelivery(token!, {
         customer_id: selectedCustomer.id,
         delivered_20lb_qty: dForm.delivered_20lb_qty,
         delivered_8lb_qty: dForm.delivered_8lb_qty,
         price_20lb: dForm.price_20lb,
         price_8lb: dForm.price_8lb,
-        payment_method: dForm.payment
+        payment_method: dForm.payment,
+        no_tax: dForm.no_tax
       });
-      alert("Delivery Submitted & Weekly Order Saved!");
-      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0 });
+      setReceipt(res.receipt);
+      setView("receipt");
+      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0, no_tax: false });
       setSelectedCustomer(null);
-      setView("choice_menu"); // Go back to choice
     } catch (e) {
-      alert("Submission failed");
+      console.error(e);
+      alert("Submission failed. Check console for details.");
     }
   };
 
@@ -177,6 +193,41 @@ export default function App() {
     )
   }
 
+  if (view === "receipt" && receipt) {
+    return (
+      <div className="min-h-screen yci-frost-bg p-6 flex flex-col items-center justify-center">
+        <YCICard title="Delivery Receipt" subtitle={receipt.customer_name}>
+          <div className="bg-white text-black p-6 rounded-lg font-mono text-sm space-y-2 border-2 border-dashed border-black/20">
+            <div className="text-center font-bold text-lg mb-2 underline">YOUR CHOICE ICE</div>
+            <div className="flex justify-between"><span>Date:</span> <span>{receipt.date}</span></div>
+            <div className="border-t border-black my-2"></div>
+            {receipt.items.map((item: any, i: number) => (
+              <div key={i} className="flex justify-between">
+                <span>{item.qty} x {item.name}</span>
+                <span>${item.subtotal.toFixed(2)}</span>
+              </div>
+            ))}
+            <div className="border-t border-black my-2"></div>
+            <div className="flex justify-between font-bold text-base">
+              <span>{receipt.tax_exempt ? "TOTAL (TAX EXEMPT):" : "TOTAL (w/ tax):"}</span>
+              <span>${receipt.total.toFixed(2)}</span>
+            </div>
+            {receipt.tax_exempt && (
+              <div className="text-center text-xs font-bold mt-2 bg-yellow-200 p-1 rounded">
+                ⚠️ TAX EXEMPT DELIVERY
+              </div>
+            )}
+            <div className="text-center text-[10px] mt-4 italic">Payment: {receipt.payment_method.toUpperCase()}</div>
+          </div>
+          <div className="mt-6 grid gap-3">
+            <YCIButton onClick={() => window.print()} variant="secondary">🖨️ Print Receipt</YCIButton>
+            <YCIButton onClick={() => setView("choice_menu")}>Done & Back</YCIButton>
+          </div>
+        </YCICard>
+      </div>
+    );
+  }
+
   if (view === "submit_delivery") {
     return (
       <div className="min-h-screen yci-frost-bg p-4 overflow-y-auto">
@@ -204,15 +255,104 @@ export default function App() {
                   <div><label className="text-[10px] text-yci-textMuted uppercase">Price ($)</label><YCIInput type="number" value={dForm.price_8lb} onChange={e => setDForm({ ...dForm, price_8lb: Number(e.target.value) })} /></div>
                 </div>
 
+                {/* No Tax Option */}
+                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+                  <input
+                    type="checkbox"
+                    id="no-tax-checkbox"
+                    checked={dForm.no_tax}
+                    onChange={(e) => setDForm({ ...dForm, no_tax: e.target.checked })}
+                    className="w-5 h-5 rounded border-white/20 bg-white/10 text-yci-accent focus:ring-2 focus:ring-yci-accent"
+                  />
+                  <label htmlFor="no-tax-checkbox" className="text-sm text-white cursor-pointer select-none">
+                    Tax Exempt (No Tax)
+                  </label>
+                </div>
+
                 <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-center">
-                  <div className="text-xs text-yci-textMuted uppercase">Estimated Total (w/ 10.75% Tax)</div>
+                  <div className="text-xs text-yci-textMuted uppercase">
+                    {dForm.no_tax ? "Estimated Total (Tax Exempt)" : "Estimated Total (w/ 10.75% Tax)"}
+                  </div>
                   <div className="text-2xl font-black text-green-400">
-                    ${(((dForm.delivered_20lb_qty * dForm.price_20lb) + (dForm.delivered_8lb_qty * dForm.price_8lb)) * 1.1075).toFixed(2)}
+                    ${dForm.no_tax
+                      ? ((dForm.delivered_20lb_qty * dForm.price_20lb) + (dForm.delivered_8lb_qty * dForm.price_8lb)).toFixed(2)
+                      : (((dForm.delivered_20lb_qty * dForm.price_20lb) + (dForm.delivered_8lb_qty * dForm.price_8lb)) * 1.1075).toFixed(2)
+                    }
                   </div>
                 </div>
-                <YCIButton onClick={submitDriverForm} className="w-full py-4 text-lg">SUBMIT ORDER</YCIButton>
+                <YCIButton onClick={proceedToPayment} className="w-full py-4 text-lg">CONTINUE TO PAYMENT</YCIButton>
               </div>
             )}
+          </div>
+        </YCICard>
+      </div>
+    );
+  }
+
+  if (view === "payment_select") {
+    const subtotal = (dForm.delivered_20lb_qty * dForm.price_20lb) + (dForm.delivered_8lb_qty * dForm.price_8lb);
+    const total = dForm.no_tax ? subtotal : subtotal * 1.1075;
+
+    return (
+      <div className="min-h-screen yci-frost-bg p-6 flex items-center justify-center">
+        <YCICard title="Select Payment Method" subtitle={`Total: $${total.toFixed(2)}`}>
+          <div className="space-y-4">
+            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+              <div className="text-sm text-yci-textMuted mb-2">Order Summary:</div>
+              <div className="text-white">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{dForm.delivered_20lb_qty} x 20lb Bags</span>
+                  <span>${(dForm.delivered_20lb_qty * dForm.price_20lb).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span>{dForm.delivered_8lb_qty} x 8lb Bags</span>
+                  <span>${(dForm.delivered_8lb_qty * dForm.price_8lb).toFixed(2)}</span>
+                </div>
+                <div className="border-t border-white/10 mt-2 pt-2">
+                  <div className="flex justify-between font-bold">
+                    <span>{dForm.no_tax ? "Total (Tax Exempt)" : "Total (w/ Tax)"}</span>
+                    <span className="text-green-400">${total.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="text-xs text-yci-textMuted uppercase mb-2">Choose Payment Method:</div>
+
+              <YCIButton
+                variant={dForm.payment === "cash" ? "primary" : "secondary"}
+                onClick={() => setDForm({ ...dForm, payment: "cash" })}
+                className="w-full py-4 text-lg"
+              >
+                💵 Cash
+              </YCIButton>
+
+              <YCIButton
+                variant={dForm.payment === "check" ? "primary" : "secondary"}
+                onClick={() => setDForm({ ...dForm, payment: "check" })}
+                className="w-full py-4 text-lg"
+              >
+                📝 Check
+              </YCIButton>
+
+              <YCIButton
+                variant={dForm.payment === "credit" ? "primary" : "secondary"}
+                onClick={() => setDForm({ ...dForm, payment: "credit" })}
+                className="w-full py-4 text-lg"
+              >
+                💳 Charge (Credit/Debit)
+              </YCIButton>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-6">
+              <YCIButton variant="ghost" onClick={() => setView("submit_delivery")}>
+                ← Back
+              </YCIButton>
+              <YCIButton onClick={submitDriverForm} className="bg-green-600 hover:bg-green-700">
+                ✓ Submit Order
+              </YCIButton>
+            </div>
           </div>
         </YCICard>
       </div>

@@ -11,6 +11,8 @@ class DistributionCenterSchema(BaseModel):
     name: str
     type: Optional[str] = None # Updated to match model/migration
     address: Optional[str] = None
+    latitude: Optional[float] = 0.0
+    longitude: Optional[float] = 0.0
     model_config = ConfigDict(from_attributes=True)
 
 class LocationBase(BaseModel):
@@ -19,6 +21,8 @@ class LocationBase(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     zip: Optional[str] = None
+    latitude: Optional[float] = 0.0
+    longitude: Optional[float] = 0.0
     access_notes: Optional[str] = None
 
 class LocationCreate(LocationBase):

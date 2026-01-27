@@ -6,7 +6,10 @@ from database import engine
 import models
 
 # Ensure tables exist
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Metadata table creation failed: {e}")
 
 app = FastAPI(title="YCI (Your Choice Ice) API", version="1.0.0")
 
@@ -32,6 +35,9 @@ app.include_router(deployments.router)
 app.include_router(logistics.router)
 app.include_router(distribution_centers.router)
 app.include_router(driver.router)
+# from routers import ..., optimization
+# ...
+# app.include_router(optimization.router)
 
 @app.get("/")
 def read_root():

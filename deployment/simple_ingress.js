@@ -19,17 +19,16 @@ const MIME_TYPES = {
 };
 
 const DIRS = {
-    'staff.yourchoiceice.com': path.join(__dirname, '../frontend-staff/dist'),
-    'admin.yourchoiceice.com': path.join(__dirname, '../frontend-admin/dist'),
-    'yourchoiceice.com': path.join(__dirname, '../frontend-customer/dist'),
-    'www.yourchoiceice.com': path.join(__dirname, '../frontend-customer/dist'),
+    'staff.yci.lvh.me': path.join(__dirname, '../frontend-staff/dist'),
+    'admin.yci.lvh.me': path.join(__dirname, '../frontend-admin/dist'),
+    'yci.lvh.me': path.join(__dirname, '../frontend-customer/dist'),
 };
 
 const server = http.createServer((req, res) => {
     const host = req.headers.host ? req.headers.host.split(':')[0] : 'localhost';
 
     // API Proxy
-    if (host === 'api.yourchoiceice.com') {
+    if (host === 'api.yci.lvh.me') {
         const options = {
             hostname: '127.0.0.1',
             port: BACKEND_PORT,
@@ -92,9 +91,9 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Ingress Server running on port ${PORT}`);
-    console.log(`Routing:`);
-    console.log(`  api.yourchoiceice.com   -> localhost:${BACKEND_PORT}`);
-    console.log(`  staff.yourchoiceice.com -> static/frontend-staff`);
-    console.log(`  admin.yourchoiceice.com -> static/frontend-admin`);
-    console.log(`  yourchoiceice.com       -> static/frontend-customer`);
+    console.log(`Routing (Zero-Config lvh.me):`);
+    console.log(`  api.yci.lvh.me   -> localhost:${BACKEND_PORT}`);
+    console.log(`  staff.yci.lvh.me -> static/frontend-staff`);
+    console.log(`  admin.yci.lvh.me -> static/frontend-admin`);
+    console.log(`  yci.lvh.me       -> static/frontend-customer`);
 });

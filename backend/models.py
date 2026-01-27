@@ -63,6 +63,8 @@ class DistributionCenter(Base):
     name = Column(String, nullable=False)
     type = Column(String) # headquarters, distribution - matched to migration SQL
     address = Column(String)
+    latitude = Column(Float, default=0.0)
+    longitude = Column(Float, default=0.0)
     
     customers = relationship("Customer", back_populates="primary_dc")
     routes = relationship("Route", back_populates="dc")
@@ -102,6 +104,8 @@ class Location(Base):
     city = Column(String)
     state = Column(String)
     zip = Column(String)
+    latitude = Column(Float, default=0.0)
+    longitude = Column(Float, default=0.0)
     access_notes = Column(Text)
     
     customer = relationship("Customer", back_populates="locations")
@@ -124,6 +128,11 @@ class Order(Base):
     requested_delivery_date = Column(Date)
     requested_window = Column(String)
     notes = Column(Text)
+    order_date = Column(Date)
+    quantity_20lb = Column(Integer, default=0)
+    quantity_8lb = Column(Integer, default=0)
+    total_price_cents = Column(Integer, default=0)
+    payment_method = Column(String)
     
     customer = relationship("Customer", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")

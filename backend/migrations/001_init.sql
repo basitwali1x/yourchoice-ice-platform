@@ -1,26 +1,27 @@
-create extension if not exists "uuid-ossp";
+-- create extension if not exists "uuid-ossp"; -- Postgres Only
 
-do $$
-begin
-  if not exists (select 1 from pg_type where typname = 'user_role') then
-    create type user_role as enum ('admin','manager','dispatcher','driver','technician','customer');
-  end if;
-  if not exists (select 1 from pg_type where typname = 'order_status') then
-    create type order_status as enum ('draft','submitted','approved','assigned','delivered','cancelled');
-  end if;
-  if not exists (select 1 from pg_type where typname = 'route_status') then
-    create type route_status as enum ('draft','published','in_progress','completed','cancelled');
-  end if;
-  if not exists (select 1 from pg_type where typname = 'stop_status') then
-    create type stop_status as enum ('pending','arrived','completed','skipped');
-  end if;
-  if not exists (select 1 from pg_type where typname = 'payment_method') then
-    create type payment_method as enum ('cash','check','credit','charge');
-  end if;
-  if not exists (select 1 from pg_type where typname = 'work_order_status') then
-    create type work_order_status as enum ('open','assigned','in_progress','completed','cancelled');
-  end if;
-end $$;
+-- Skipping Enum checks for SQLite
+-- do $$
+-- begin
+--   if not exists (select 1 from pg_type where typname = 'user_role') then
+--     create type user_role as enum ('admin','manager','dispatcher','driver','technician','customer');
+--   end if;
+--   if not exists (select 1 from pg_type where typname = 'order_status') then
+--     create type order_status as enum ('draft','submitted','approved','assigned','delivered','cancelled');
+--   end if;
+--   if not exists (select 1 from pg_type where typname = 'route_status') then
+--     create type route_status as enum ('draft','published','in_progress','completed','cancelled');
+--   end if;
+--   if not exists (select 1 from pg_type where typname = 'stop_status') then
+--     create type stop_status as enum ('pending','arrived','completed','skipped');
+--   end if;
+--   if not exists (select 1 from pg_type where typname = 'payment_method') then
+--     create type payment_method as enum ('cash','check','credit','charge');
+--   end if;
+--   if not exists (select 1 from pg_type where typname = 'work_order_status') then
+--     create type work_order_status as enum ('open','assigned','in_progress','completed','cancelled');
+--   end if;
+-- end $$;
 
 create table if not exists users (
   id uuid primary key default uuid_generate_v4(),
