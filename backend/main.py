@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, routes, orders, reports, customers, locations, products, work_orders, integrations, deployments, logistics, distribution_centers, driver
+from routers import auth, routes, orders, reports, customers, locations, products, work_orders, integrations, deployments, logistics, distribution_centers, driver, users
 from database import engine
 import models
 
@@ -35,6 +35,7 @@ app.include_router(deployments.router)
 app.include_router(logistics.router)
 app.include_router(distribution_centers.router)
 app.include_router(driver.router)
+app.include_router(users.router)
 # from routers import ..., optimization
 # ...
 # app.include_router(optimization.router)
