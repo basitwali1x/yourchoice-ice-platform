@@ -4,15 +4,17 @@ This document outlines the current state of the "Your Choice Ice" Admin Dashboar
 
 ## ✅ Completed Modules
 
-### 1. **Executive Dashboard**
-- **KPI Overview**: Real-time metrics for Revenue, Active Drivers, and Pending Orders.
-- **Regional Intelligence**: Breakdown of performance by Distribution Center (Leesville / Lake Charles / Lufkin).
-- **Revenue Heatmap**: 7-Day visual forecast of sales trends (Projected vs Actual).
+### 1. **Executive Control Room (v2.0)**
+*Redesigned Jan 27, 2026*
+- **Top Command Bar**: Fixed, always-visible status bar answering 5 critical questions (Revenue, Alerts, Fleet, Customers, Health).
+- **Action Tiles**: Clickable KPIs that drill down into problems (e.g., "3 Critical Alerts" -> Filtered View).
+- **Live Ops Snapshot**: Real-time map combined with active driver list.
+- **Revenue Heatmap**: Global view of network performance.
 
 ### 2. **Logistics & Routing**
 - **Route Visualization**: View optimized delivery routes for each driver.
 - **Stop Sequencing**: Detail view of delivery order (Stop #1, #2, etc.).
-- **Map Interface**: Visual representation of route segments (using Mapbox placeholder).
+- **Map Integration**: Visual representation of route segments.
 
 ### 3. **Inventory Control**
 - **Product Management**: Active SKU list (e.g., 20lb Bag, 8lb Bag).

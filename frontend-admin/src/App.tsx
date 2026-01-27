@@ -982,145 +982,146 @@ export default function App() {
                       </div>
                     </div>
                   )}
-                  <div className="space-y-12 animate-fade-in max-w-6xl">
-                    <header className="flex justify-between items-end">
-                      <div>
-                        <h2 className="text-3xl font-black uppercase italic tracking-[0.3em] text-white/40">Neural Sync Command</h2>
-                        <p className="text-xs text-yci-textMuted uppercase mt-2 font-bold tracking-widest">Global pipeline status across secondary cloud nodes.</p>
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-yci-accent animate-pulse" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Network Secure</span>
+                  {nav === "Cloud" && (
+                    <div className="space-y-12 animate-fade-in max-w-6xl">
+                      <header className="flex justify-between items-end">
+                        <div>
+                          <h2 className="text-3xl font-black uppercase italic tracking-[0.3em] text-white/40">Neural Sync Command</h2>
+                          <p className="text-xs text-yci-textMuted uppercase mt-2 font-bold tracking-widest">Global pipeline status across secondary cloud nodes.</p>
                         </div>
-                      </div>
-                    </header>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                      {/* QuickBooks Card */}
-                      <YCICard title="QuickBooks Online" className="relative group overflow-hidden">
-                        <div className="absolute top-4 right-6">
-                          <div className={`h-2.5 w-2.5 rounded-full ${integrationStatus?.quickbooks?.connected ? 'bg-green-400' : 'bg-red-500'} shadow-lg`} />
-                        </div>
-                        <div className="p-4 space-y-8">
-                          <div className="text-center py-6">
-                            <div className="text-4xl mb-4">💼</div>
-                            <div className="font-black text-xl italic tracking-tighter uppercase">Accounting Core</div>
-                            <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">Automated ledger propagation of regional delivery payloads.</p>
-                          </div>
-
-                          <div className="space-y-4">
-                            {!integrationStatus?.quickbooks?.connected ? (
-                              <YCIButton onClick={async () => {
-                                try {
-                                  const res = await fetch(`${API_URL}/integrations/quickbooks/auth`);
-                                  const d = await res.json();
-                                  alert("Simulating OAuth Handshake... Handled.");
-                                  fetchCloudStatus();
-                                } catch (e) { alert("Auth Failed"); }
-                              }} className="w-full !rounded-2xl font-black py-4">INITIALIZE SECURE LINK</YCIButton>
-                            ) : (
-                              <>
-                                <div className="bg-black/20 p-4 rounded-xl border border-white/5">
-                                  <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">Last Sync Cycle</div>
-                                  <div className="text-xs font-mono text-yci-accent">{integrationStatus.quickbooks.last_sync}</div>
-                                </div>
-                                <YCIButton variant="secondary" onClick={async () => {
-                                  setLoading(true);
-                                  try {
-                                    const res = await fetch(`${API_URL}/integrations/quickbooks/sync`, { method: "POST" });
-                                    const d = await res.json();
-                                    alert(d.message);
-                                    fetchCloudStatus();
-                                  } catch (e) { } finally { setLoading(false); }
-                                }} className="w-full !rounded-2xl font-black py-4">PUSH 24H LEDGER</YCIButton>
-                              </>
-                            )}
+                        <div className="flex gap-4">
+                          <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl flex items-center gap-3">
+                            <div className="h-2 w-2 rounded-full bg-yci-accent animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Network Secure</span>
                           </div>
                         </div>
-                      </YCICard>
+                      </header>
 
-                      {/* Google Sheets Card */}
-                      <YCICard title="Google Sheets API" className="relative group overflow-hidden">
-                        <div className="absolute top-4 right-6">
-                          <div className={`h-2.5 w-2.5 rounded-full ${integrationStatus?.google_sheets?.connected ? 'bg-green-400' : 'bg-white/10'} shadow-lg`} />
-                        </div>
-                        <div className="p-4 space-y-8">
-                          <div className="text-center py-6">
-                            <div className="text-4xl mb-4">📊</div>
-                            <div className="font-black text-xl italic tracking-tighter uppercase">Live Sheet Link</div>
-                            <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">Bidirectional mapping of customer coordinates and route metadata.</p>
+                      <div className="grid md:grid-cols-3 gap-8">
+                        {/* QuickBooks Card */}
+                        <YCICard title="QuickBooks Online" className="relative group overflow-hidden">
+                          <div className="absolute top-4 right-6">
+                            <div className={`h-2.5 w-2.5 rounded-full ${integrationStatus?.quickbooks?.connected ? 'bg-green-400' : 'bg-red-500'} shadow-lg`} />
                           </div>
-
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <label className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest px-2">Deployment Sheet ID</label>
-                              <YCIInput value={integrationStatus?.google_sheets?.sheet_id || ""}
-                                placeholder="Enter Google Sheet ID..."
-                                onChange={(e) => handleUpdateSetting("google_sheet_id", e.target.value)}
-                                className="!bg-black/30 !py-3 !text-xs !font-mono" />
+                          <div className="p-4 space-y-8">
+                            <div className="text-center py-6">
+                              <div className="text-4xl mb-4">💼</div>
+                              <div className="font-black text-xl italic tracking-tighter uppercase">Accounting Core</div>
+                              <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">Automated ledger propagation of regional delivery payloads.</p>
                             </div>
 
-                            {integrationStatus?.google_sheets?.connected && (
-                              <>
-                                <div className="bg-black/20 p-4 rounded-xl border border-white/5">
-                                  <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">State Consensus</div>
-                                  <div className="text-xs font-mono text-yci-accent">{integrationStatus.google_sheets.last_sync}</div>
-                                </div>
-                                <YCIButton variant="secondary" onClick={async () => {
-                                  setLoading(true);
+                            <div className="space-y-4">
+                              {!integrationStatus?.quickbooks?.connected ? (
+                                <YCIButton onClick={async () => {
                                   try {
-                                    const res = await fetch(`${API_URL}/integrations/google-sheets/sync`, { method: "POST" });
+                                    const res = await fetch(`${API_URL}/integrations/quickbooks/auth`);
                                     const d = await res.json();
-                                    alert(d.message);
+                                    alert("Simulating OAuth Handshake... Handled.");
                                     fetchCloudStatus();
-                                  } catch (e) { } finally { setLoading(false); }
-                                }} className="w-full !rounded-2xl font-black py-4">PULL EXTERNAL DATA</YCIButton>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </YCICard>
-
-                      {/* Excel Card */}
-                      <YCICard title="Legacy Excel Pipeline" className="relative group overflow-hidden">
-                        <div className="p-4 space-y-8">
-                          <div className="text-center py-6">
-                            <div className="text-4xl mb-4">📁</div>
-                            <div className="font-black text-xl italic tracking-tighter uppercase">Bulk CSV/XLSX</div>
-                            <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">High-volume injection of historical partner archives and seasonal order blobs.</p>
-                          </div>
-
-                          <div className="space-y-6">
-                            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
-                              <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">Buffer Status</div>
-                              <div className="text-xs font-mono text-green-400">READY FOR PROPAGATION</div>
+                                  } catch (e) { alert("Auth Failed"); }
+                                }} className="w-full !rounded-2xl font-black py-4">INITIALIZE SECURE LINK</YCIButton>
+                              ) : (
+                                <>
+                                  <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                                    <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">Last Sync Cycle</div>
+                                    <div className="text-xs font-mono text-yci-accent">{integrationStatus.quickbooks.last_sync}</div>
+                                  </div>
+                                  <YCIButton variant="secondary" onClick={async () => {
+                                    setLoading(true);
+                                    try {
+                                      const res = await fetch(`${API_URL}/integrations/quickbooks/sync`, { method: "POST" });
+                                      const d = await res.json();
+                                      alert(d.message);
+                                      fetchCloudStatus();
+                                    } catch (e) { } finally { setLoading(false); }
+                                  }} className="w-full !rounded-2xl font-black py-4">PUSH 24H LEDGER</YCIButton>
+                                </>
+                              )}
                             </div>
-                            <YCIButton variant="secondary" onClick={() => {
-                              const input = document.createElement('input');
-                              input.type = 'file';
-                              input.accept = '.xlsx';
-                              input.onchange = (e: any) => {
-                                if (e.target.files?.[0]) handleExcelUpload(e.target.files[0]);
-                              };
-                              input.click();
-                            }} className="w-full !rounded-2xl font-black py-4 uppercase text-[10px] tracking-widest shadow-lg">INJECT SOURCE FILE</YCIButton>
                           </div>
+                        </YCICard>
+
+                        {/* Google Sheets Card */}
+                        <YCICard title="Google Sheets API" className="relative group overflow-hidden">
+                          <div className="absolute top-4 right-6">
+                            <div className={`h-2.5 w-2.5 rounded-full ${integrationStatus?.google_sheets?.connected ? 'bg-green-400' : 'bg-white/10'} shadow-lg`} />
+                          </div>
+                          <div className="p-4 space-y-8">
+                            <div className="text-center py-6">
+                              <div className="text-4xl mb-4">📊</div>
+                              <div className="font-black text-xl italic tracking-tighter uppercase">Live Sheet Link</div>
+                              <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">Bidirectional mapping of customer coordinates and route metadata.</p>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <label className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest px-2">Deployment Sheet ID</label>
+                                <YCIInput value={integrationStatus?.google_sheets?.sheet_id || ""}
+                                  placeholder="Enter Google Sheet ID..."
+                                  onChange={(e) => handleUpdateSetting("google_sheet_id", e.target.value)}
+                                  className="!bg-black/30 !py-3 !text-xs !font-mono" />
+                              </div>
+
+                              {integrationStatus?.google_sheets?.connected && (
+                                <>
+                                  <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                                    <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">State Consensus</div>
+                                    <div className="text-xs font-mono text-yci-accent">{integrationStatus.google_sheets.last_sync}</div>
+                                  </div>
+                                  <YCIButton variant="secondary" onClick={async () => {
+                                    setLoading(true);
+                                    try {
+                                      const res = await fetch(`${API_URL}/integrations/google-sheets/sync`, { method: "POST" });
+                                      const d = await res.json();
+                                      alert(d.message);
+                                      fetchCloudStatus();
+                                    } catch (e) { } finally { setLoading(false); }
+                                  }} className="w-full !rounded-2xl font-black py-4">PULL EXTERNAL DATA</YCIButton>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </YCICard>
+
+                        {/* Excel Card */}
+                        <YCICard title="Legacy Excel Pipeline" className="relative group overflow-hidden">
+                          <div className="p-4 space-y-8">
+                            <div className="text-center py-6">
+                              <div className="text-4xl mb-4">📁</div>
+                              <div className="font-black text-xl italic tracking-tighter uppercase">Bulk CSV/XLSX</div>
+                              <p className="text-[10px] text-yci-textMuted mt-2 uppercase tracking-widest leading-relaxed">High-volume injection of historical partner archives and seasonal order blobs.</p>
+                            </div>
+
+                            <div className="space-y-6">
+                              <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                                <div className="text-[8px] font-black text-yci-textMuted uppercase tracking-widest mb-1">Buffer Status</div>
+                                <div className="text-xs font-mono text-green-400">READY FOR PROPAGATION</div>
+                              </div>
+                              <YCIButton variant="secondary" onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = '.xlsx';
+                                input.onchange = (e: any) => {
+                                  if (e.target.files?.[0]) handleExcelUpload(e.target.files[0]);
+                                };
+                                input.click();
+                              }} className="w-full !rounded-2xl font-black py-4 uppercase text-[10px] tracking-widest shadow-lg">INJECT SOURCE FILE</YCIButton>
+                            </div>
+                          </div>
+                        </YCICard>
+                      </div>
+
+                      <YCICard title="Real-Time Integration Logs" subtitle="Console output from secondary cloud relay nodes.">
+                        <div className="bg-black/40 rounded-3xl p-8 font-mono text-[10px] text-yci-accent/60 h-48 overflow-y-auto space-y-2 custom-scrollbar">
+                          <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-white">SYS: SECURE NODE HANDSHAKE COMPLETE</span></div>
+                          <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span>DB: PERSISTING CLOUD PURE STATE... OK</span></div>
+                          <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-green-400">AUTH: QBO TOKEN RENEWED (SIMULATED)</span></div>
+                          <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span>API: LISTENING FOR EXTERNAL WEBHOOKS</span></div>
+                          <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-white">GEOMAPPING: 278 NODES SYNCED TO GOOGLE CLOUD</span></div>
                         </div>
                       </YCICard>
                     </div>
-
-                    <YCICard title="Real-Time Integration Logs" subtitle="Console output from secondary cloud relay nodes.">
-                      <div className="bg-black/40 rounded-3xl p-8 font-mono text-[10px] text-yci-accent/60 h-48 overflow-y-auto space-y-2 custom-scrollbar">
-                        <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-white">SYS: SECURE NODE HANDSHAKE COMPLETE</span></div>
-                        <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span>DB: PERSISTING CLOUD PURE STATE... OK</span></div>
-                        <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-green-400">AUTH: QBO TOKEN RENEWED (SIMULATED)</span></div>
-                        <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span>API: LISTENING FOR EXTERNAL WEBHOOKS</span></div>
-                        <div className="flex gap-4"><span>[{new Date().toLocaleTimeString()}]</span> <span className="text-white">GEOMAPPING: 278 NODES SYNCED TO GOOGLE CLOUD</span></div>
-                      </div>
-                    </YCICard>
-                  </div>
-              )}
+                  )}
                 </div>
               )
             )
