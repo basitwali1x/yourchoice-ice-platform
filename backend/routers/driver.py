@@ -18,6 +18,8 @@ class DriverDeliverySchema(BaseModel):
     # Tax is calculated server-side now
     payment_method: str = "credit"
     no_tax: bool = False  # Option to skip tax calculation
+    photo_url: Optional[str] = None
+    signature_url: Optional[str] = None
 
 @router.post("/delivery")
 def submit_driver_delivery(data: DriverDeliverySchema, db: Session = Depends(get_db)):
@@ -54,7 +56,9 @@ def submit_driver_delivery(data: DriverDeliverySchema, db: Session = Depends(get
         quantity_8lb=data.delivered_8lb_qty,
         total_price_cents=total_cents,
         payment_method=data.payment_method,
-        notes=f"Driver direct delivery. Sub: ${subtotal:.2f}, {tax_note}"
+        notes=f"Driver direct delivery. Sub: ${subtotal:.2f}, {tax_note}",
+        photo_url=data.photo_url,
+        signature_url=data.signature_url
     )
     db.add(new_order)
     db.flush()

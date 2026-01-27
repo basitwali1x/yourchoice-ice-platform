@@ -97,6 +97,8 @@ class DeliveryCreate(BaseModel):
     check_number: Optional[str] = None
     card_last4: Optional[str] = None
     notes: Optional[str] = None
+    photo_url: Optional[str] = None
+    signature_url: Optional[str] = None
 
 class RouteStopSchema(BaseModel):
     id: str

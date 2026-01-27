@@ -4,6 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import auth, routes, orders, reports, customers, locations, products, work_orders, integrations, deployments, logistics, distribution_centers, driver, users
 from database import engine
 import models
+from fastapi.staticfiles import StaticFiles
+import os
+
+# Create uploads dir if not exists (relative to backend/)
+UPLOAD_DIR = "data/uploads"
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
 
 # Ensure tables exist
 try:
@@ -12,6 +19,9 @@ except Exception as e:
     print(f"Warning: Metadata table creation failed: {e}")
 
 app = FastAPI(title="YCI (Your Choice Ice) API", version="1.0.0")
+
+# Mount static files
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

@@ -64,3 +64,15 @@ export async function getCustomers(token: string, dc_id?: string) {
     });
     return res.json();
 }
+
+export async function uploadFile(token: string, file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_URL}/logistics/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+    });
+    if (!res.ok) throw new Error("Upload failed");
+    return res.json();
+}

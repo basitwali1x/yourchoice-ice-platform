@@ -133,6 +133,8 @@ class Order(Base):
     quantity_8lb = Column(Integer, default=0)
     total_price_cents = Column(Integer, default=0)
     payment_method = Column(String)
+    photo_url = Column(String)
+    signature_url = Column(String)
     
     customer = relationship("Customer", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")

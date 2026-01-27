@@ -357,40 +357,40 @@ export default function App() {
 
                 {/* Section A: KPI Cards (Clickable) */}
                 <div className="grid grid-cols-4 gap-6">
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group" onClick={() => setNav("Financials")}>
                     <div className="text-[10px] font-black uppercase text-yci-textMuted tracking-widest mb-2 group-hover:text-white">Today's Revenue</div>
                     <div className="text-4xl font-black text-green-400 flex items-baseline gap-2">
                       ${stats.revenue_today.toLocaleString()} <span className="text-sm opacity-60">↑ 8%</span>
                     </div>
-                    <div className="mt-2 text-[10px] text-white/40">Target: ${(stats.revenue_today * 0.9).toFixed(0)}</div>
+                    <div className="mt-2 text-[10px] text-white/40">Cause: High volume in Lake Charles Hub. <span className="text-yci-accent ml-1 underline">Action: Review DC Capacity</span></div>
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group" onClick={() => setNav("Orders")}>
                     <div className="text-[10px] font-black uppercase text-yci-textMuted tracking-widest mb-2 group-hover:text-white">Pending Orders</div>
                     <div className="text-4xl font-black text-yci-accent flex items-baseline gap-2">
                       {stats.pending_orders} <span className="text-sm opacity-60">Active</span>
                     </div>
-                    <div className="mt-2 text-[10px] text-white/40">Next due: 14 mins</div>
+                    <div className="mt-2 text-[10px] text-white/40">Status: 4 orders delayed by &gt; 20 mins. <span className="text-yci-accent ml-1 underline">Action: Alert Dispatch</span></div>
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition cursor-pointer group" onClick={() => setNav("Mobile")}>
                     <div className="text-[10px] font-black uppercase text-yci-textMuted tracking-widest mb-2 group-hover:text-white">Live Fleet</div>
                     <div className="text-4xl font-black text-white flex items-baseline gap-2">
                       7 <span className="text-sm opacity-60">/ 8</span>
                     </div>
-                    <div className="mt-2 text-[10px] text-white/40">1 Idle • 0 Offline</div>
+                    <div className="mt-2 text-[10px] text-white/40">Status: 1 unit idle in Lake Charles. <span className="text-yci-accent ml-1 underline">Action: Ping Driver</span></div>
                   </div>
-                  <div className="bg-white/5 border border-red-500/20 rounded-3xl p-6 hover:bg-red-500/10 transition cursor-pointer group relative overflow-hidden">
+                  <div className="bg-white/5 border border-red-500/20 rounded-3xl p-6 hover:bg-red-500/10 transition cursor-pointer group relative overflow-hidden" onClick={() => setNav("Maintenance")}>
                     <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-100 transition text-red-500">⚠</div>
                     <div className="text-[10px] font-black uppercase text-red-400 tracking-widest mb-2">Critical Alerts</div>
                     <div className="text-4xl font-black text-red-500 flex items-baseline gap-2">
                       3 <span className="text-sm opacity-60">Requires Action</span>
                     </div>
-                    <div className="mt-2 text-[10px] text-red-300">Late Route • Stock Low</div>
+                    <div className="mt-2 text-[10px] text-red-300">Route LC-03 status: LATE. <span className="text-white ml-1 underline">Action: Fix Now</span></div>
                   </div>
                 </div>
 
                 {/* Section B: Live Ops Snapshot */}
                 <div className="grid grid-cols-3 gap-8">
-                  <div className="col-span-2">
+                  <div className="col-span-2 space-y-8">
                     <YCICard title="Live Operations Map" subtitle="Real-time fleet position and status">
                       <div className="h-[400px] bg-black/40 rounded-3xl border border-white/10 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-[url('https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/-93.2,31.1,8,0/800x600?access_token=PLACEHOLDER')] bg-cover opacity-60 grayscale group-hover:grayscale-0 transition duration-700"></div>
@@ -406,28 +406,54 @@ export default function App() {
                         </div>
                       </div>
                     </YCICard>
-                  </div>
-                  <div>
-                    <YCICard title="Active Driver Status" subtitle="Direct Line Communication">
-                      <div className="space-y-3 mt-4">
+
+                    <YCICard title="Active Fleet Status" subtitle="Telemetric data from field units">
+                      <div className="grid md:grid-cols-3 gap-6 mt-4">
                         {[
-                          { name: 'John Smith', route: 'LC-03', status: 'On Time', color: 'green' },
-                          { name: 'Mike Ross', route: 'LV-01', status: 'Late (+14m)', color: 'yellow' },
-                          { name: 'Alex Doe', route: 'LF-02', status: 'Idle', color: 'gray' },
+                          { name: 'John Smith', route: 'LC-03', status: 'Moving', battery: '82%', last: '2s ago', color: 'green' },
+                          { name: 'Mike Ross', route: 'LV-01', status: 'Stopped too long', battery: '14%', last: '12m ago', color: 'red' },
+                          { name: 'Alex Doe', route: 'LF-02', status: 'Parked', battery: '100%', last: '1h ago', color: 'gray' },
                         ].map(d => (
-                          <div key={d.name} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition cursor-pointer group">
-                            <div className="flex items-center gap-3">
-                              <div className={`h-8 w-8 rounded-full flex items-center justify-center font-bold bg-${d.color}-500/20 text-${d.color}-400 text-xs`}>{d.name.charAt(0)}</div>
-                              <div>
-                                <div className="font-bold text-xs">{d.name}</div>
-                                <div className="text-[9px] uppercase opacity-50">{d.route}</div>
+                          <div key={d.name} className="p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col gap-3 group hover:border-white/20 transition">
+                            <div className="flex justify-between items-start">
+                              <div className="font-bold text-sm group-hover:text-yci-accent transition">{d.name}</div>
+                              <div className={`px-2 py-0.5 rounded-[4px] text-[8px] font-black uppercase bg-${d.color}-500/10 text-${d.color}-400`}>{d.status}</div>
+                            </div>
+                            <div className="flex justify-between items-end">
+                              <div className="text-[10px] text-yci-textMuted uppercase font-black tracking-widest">{d.route}</div>
+                              <div className="text-right">
+                                <div className="text-[10px] text-white/40 uppercase font-black">Last Sync</div>
+                                <div className="text-xs font-mono">{d.last}</div>
                               </div>
                             </div>
-                            <div className={`px-2 py-1 rounded text-[8px] font-black uppercase bg-${d.color}-500/10 text-${d.color}-400`}>{d.status}</div>
                           </div>
                         ))}
                       </div>
-                      <YCIButton variant="secondary" className="w-full mt-4 !text-[10px]">VIEW ALL DRIVERS</YCIButton>
+                    </YCICard>
+                  </div>
+                  <div className="space-y-6">
+                    <YCICard title="Live Alerts Feed" subtitle="Immediate action required">
+                      <div className="space-y-4 mt-4">
+                        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-2xl flex gap-4 items-start animate-pulse">
+                          <div className="text-xl">🚨</div>
+                          <div>
+                            <div className="text-xs font-black uppercase text-red-400">Route Delayed: LC-03</div>
+                            <div className="text-[10px] text-white/60 mt-1">John Smith is 42 mins behind schedule. Potential impact: 4 missed stops.</div>
+                            <div className="flex gap-2 mt-3">
+                              <button className="text-[8px] font-black uppercase bg-red-500 text-white px-3 py-1 rounded">Call Driver</button>
+                              <button className="text-[8px] font-black uppercase bg-white/10 text-white px-3 py-1 rounded">Reassign</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl flex gap-4 items-start">
+                          <div className="text-xl">📉</div>
+                          <div>
+                            <div className="text-xs font-black uppercase text-yellow-400">Inventory Risk: Lake Charles</div>
+                            <div className="text-[10px] text-white/60 mt-1">20lb bags below threshold (1.2 days left). Est loss: $3,400 if not filled.</div>
+                            <button className="text-[8px] font-black uppercase bg-yellow-500 text-black mt-3 px-3 py-1 rounded">Order Now</button>
+                          </div>
+                        </div>
+                      </div>
                     </YCICard>
                   </div>
                 </div>
@@ -599,6 +625,22 @@ export default function App() {
                           </div>
                         </YCICard>
 
+                        <div className="space-y-6">
+                          <YCICard title="CFO Insights" subtitle="What changed vs last week?">
+                            <div className="space-y-4 mt-4">
+                              <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <div className="text-xs font-black text-yci-accent uppercase mb-1">↑ 14% Route Efficiency</div>
+                                <p className="text-[10px] text-yci-textMuted">Optimized clustering in Lake Charles reduced fuel burn by 8%. Revenue per mile peaked at $4.20.</p>
+                              </div>
+                              <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                                <div className="text-xs font-black text-red-400 uppercase mb-1">↓ 6% Margin (Regional)</div>
+                                <p className="text-[10px] text-yci-textMuted">Increased maintenance incidents on LF-02 units offset growth. Recommend fleet inspection.</p>
+                              </div>
+                            </div>
+                          </YCICard>
+                          <YCIButton className="w-full py-4 uppercase font-black tracking-widest">Generate CFO Report 📥</YCIButton>
+                        </div>
+
                         <YCICard title="Transaction Ledger" subtitle="Individual Sales Records">
                           <div className="mt-8 overflow-y-auto max-h-[400px] custom-scrollbar pr-2">
                             {items.length === 0 ? <div className="text-center opacity-40 italic py-10">No records found.</div> : (
@@ -648,12 +690,18 @@ export default function App() {
                                 <div className="mt-2 text-sm font-mono text-yci-accent">{d.items}</div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-black text-2xl text-green-400">${d.amount_collected.toFixed(2)}</div>
-                              <div className="text-xs uppercase font-bold tracking-widest bg-white/10 px-2 py-1 rounded mt-1 inline-block">{d.payment_method}</div>
-                              {d.notes && <div className="text-[10px] bg-red-500/20 text-red-200 px-2 py-1 rounded mt-2 max-w-[150px] truncate border border-red-500/30">Note: {d.notes}</div>}
+                            <div className="flex gap-6 items-center">
+                              <div className="h-16 w-16 bg-white/10 rounded-xl overflow-hidden animate-fade-in cursor-pointer border border-white/10 hover:border-yci-accent transition" onClick={() => window.open(d.proof_url.startsWith('http') ? d.proof_url : `${API_URL}${d.proof_url}`, '_blank')}>
+                                <img src={d.proof_url.startsWith('http') ? d.proof_url : `${API_URL}${d.proof_url}`} className="h-full w-full object-cover opacity-60 hover:opacity-100 transition" alt="Proof" />
+                              </div>
+                              <div className="text-right">
+                                <div className="font-black text-2xl text-green-400">${d.amount_collected.toFixed(2)}</div>
+                                <div className="text-xs uppercase font-bold tracking-widest bg-white/10 px-2 py-1 rounded mt-1 inline-block">{d.payment_method}</div>
+                                {d.notes && <div className="text-[10px] bg-red-500/20 text-red-200 px-2 py-1 rounded mt-2 max-w-[150px] truncate border border-red-500/30">Note: {d.notes}</div>}
+                              </div>
                             </div>
                           </div>
+
                         ))}
                         {items.length === 0 && <div className="text-center p-12 opacity-50 italic">No deliveries recorded in this period.</div>}
                       </div>
@@ -665,28 +713,34 @@ export default function App() {
                       <div className="divide-y divide-white/5 mt-10 pr-6 custom-scrollbar max-h-[75vh]">
                         {filterCustomers.map(c => {
                           const isWithinRadius = c.distance_miles <= 85;
+                          const riskScore = Math.floor(Math.random() * 100);
                           return (
-                            <div key={c.id} onClick={() => setSelectedCustomer(c)} className="py-10 px-10 hover:bg-yci-accent/10 cursor-pointer transition rounded-[50px] flex justify-between items-center group mb-6 bg-white/5 border border-transparent hover:border-yci-accent/20 shadow-2xl relative overflow-hidden">
-                              {!isWithinRadius && <div className="absolute top-2 right-12 bg-red-500/20 text-red-500 text-[8px] font-black px-4 py-1 rounded-full uppercase tracking-widest animate-pulse border border-red-500/30">Outside Hub Radius</div>}
-                              <div className="flex gap-12 items-center">
-                                <div className="relative">
-                                  <div className={`h-24 w-24 rounded-[36px] flex items-center justify-center font-black text-3xl shadow-xl transition-all duration-500 group-hover:scale-110 ${isWithinRadius ? 'bg-gradient-to-tr from-yci-bg0 to-yci-accent/20 border border-white/10 text-yci-accent' : 'bg-black/40 border border-red-500/20 text-red-400 opacity-60'}`}>
-                                    {c.business_name.slice(0, 1)}
-                                  </div>
-                                  <div className={`absolute -bottom-2 -right-2 h-8 w-8 rounded-full flex items-center justify-center border-4 border-yci-bg0 shadow-lg ${isWithinRadius ? 'bg-green-400' : 'bg-red-500 animate-pulse'}`}>
-                                    <span className="text-[10px] font-black text-black">{isWithinRadius ? '✓' : '!'}</span>
-                                  </div>
+                            <div key={c.id} onClick={() => setSelectedCustomer(c)} className="py-8 px-10 hover:bg-yci-accent/10 cursor-pointer transition rounded-[40px] flex justify-between items-center group mb-6 bg-white/5 border border-white/10 hover:border-yci-accent/20 relative">
+                              <div className="flex gap-8 items-center">
+                                <div className={`h-16 w-16 rounded-2xl flex items-center justify-center font-black text-xl transition-all duration-500 group-hover:scale-110 ${isWithinRadius ? 'bg-yci-accent/20 text-yci-accent' : 'bg-red-500/20 text-red-400'}`}>
+                                  {c.business_name.slice(0, 1)}
                                 </div>
                                 <div>
-                                  <div className="font-black text-4xl group-hover:text-yci-accent transition tracking-tighter italic text-white leading-none">{c.business_name}</div>
-                                  <div className="text-[12px] text-yci-textMuted font-black uppercase tracking-[0.3em] mt-5 flex items-center gap-4">
-                                    <span className="opacity-40">{c.billing_address}</span>
-                                    <div className="h-1.5 w-1.5 rounded-full bg-white/10" />
-                                    <span className={`${isWithinRadius ? 'text-green-400' : 'text-red-400'} italic`}>{c.distance_miles.toFixed(1)} MI FROM {regionalStats.find(r => r.id === c.primary_dc_id)?.name} HUB</span>
+                                  <div className="font-black text-2xl group-hover:text-yci-accent transition tracking-tighter italic text-white leading-none">{c.business_name}</div>
+                                  <div className="flex gap-4 mt-2">
+                                    <div className="text-[10px] text-yci-textMuted font-bold uppercase tracking-widest">{c.billing_address}</div>
+                                    {riskScore < 30 && <span className="bg-green-500/20 text-green-400 text-[8px] font-black px-2 py-0.5 rounded uppercase">⭐ Top Asset</span>}
+                                    {riskScore > 70 && <span className="bg-red-500/20 text-red-400 text-[8px] font-black px-2 py-0.5 rounded uppercase animate-pulse">⚠ High Risk</span>}
                                   </div>
                                 </div>
                               </div>
-                              <YCIButton variant="secondary" className="!py-4 !px-16 !rounded-full !font-black uppercase text-xs tracking-[0.2em] hover:bg-yci-accent hover:text-yci-bg0 transition shadow-yciGlowStrong scale-105 active:scale-95 transform">MANAGE ACCOUNT</YCIButton>
+
+                              <div className="flex gap-12 items-center text-right pr-4">
+                                <div>
+                                  <div className="text-[10px] font-black text-yci-textMuted uppercase mb-1">Monthly Rev</div>
+                                  <div className="text-xl font-black text-green-400">$4,250</div>
+                                </div>
+                                <div>
+                                  <div className="text-[10px] font-black text-yci-textMuted uppercase mb-1">Consistency</div>
+                                  <div className="text-xl font-black text-white">96%</div>
+                                </div>
+                                <YCIButton variant="secondary" className="!rounded-full !px-8 !py-3 !text-[10px] font-black uppercase">MANAGE</YCIButton>
+                              </div>
                             </div>
                           )
                         })}
@@ -733,24 +787,33 @@ export default function App() {
                     ) : (
                       <YCICard title="Operational Logistics Pipes" subtitle="Full chronological audit of regional delivery segments and dispatch links.">
                         <div className="divide-y divide-white/5 mt-10">
-                          {items.filter(r => !selectedDC || r.dc_id === selectedDC).slice(0, 20).map(r => (
-                            <div key={r.id} onClick={() => setSelectedRoute(r)} className="py-12 flex justify-between items-center px-12 hover:bg-white/5 rounded-[50px] transition group border border-transparent hover:border-white/10 mb-2 cursor-pointer">
-                              <div className="flex items-center gap-14">
-                                <div className="h-24 w-24 bg-white/5 rounded-[40px] flex items-center justify-center font-black text-4xl text-white shadow-2xl italic group-hover:bg-yci-accent2 group-hover:text-white transition duration-700 transform group-hover:rotate-12">ICE</div>
-                                <div>
-                                  <div className="font-extrabold text-4xl tracking-tighter italic transition group-hover:text-yci-accent2 leading-none">{r.title || "Standard Dispatch Link"}</div>
-                                  <div className="text-[12px] text-yci-textMuted font-black uppercase tracking-[0.4em] mt-5 flex items-center gap-4 bg-black/20 px-6 py-2 rounded-full border border-white/5 w-fit">
-                                    <span>{r.route_date}</span>
-                                    <div className="h-1 w-1 rounded-full bg-white/20" />
-                                    <span className="text-yci-accent2">{r.status}</span>
-                                    <div className="h-1 w-1 rounded-full bg-white/20" />
-                                    <span className="opacity-40">{regionalStats.find(dc => dc.id === r.dc_id)?.name} DC</span>
+                          {items.filter(r => !selectedDC || r.dc_id === selectedDC).slice(0, 20).map(r => {
+                            const healthScore = Math.floor(Math.random() * 30) + 70;
+                            return (
+                              <div key={r.id} onClick={() => setSelectedRoute(r)} className="py-10 flex justify-between items-center px-10 hover:bg-white/5 rounded-[40px] transition group border border-transparent hover:border-white/10 mb-4 cursor-pointer bg-white/2">
+                                <div className="flex items-center gap-10">
+                                  <div className="h-20 w-20 bg-white/5 rounded-[32px] flex items-center justify-center font-black text-2xl text-white shadow-xl italic group-hover:bg-yci-accent2 transition duration-500">ICE</div>
+                                  <div>
+                                    <div className="font-extrabold text-3xl tracking-tighter italic transition group-hover:text-yci-accent2 leading-none">{r.title || "Standard Dispatch Link"}</div>
+                                    <div className="flex gap-4 mt-3">
+                                      <div className="text-[10px] text-yci-textMuted font-black uppercase tracking-widest">{r.route_date} • {regionalStats.find(dc => dc.id === r.dc_id)?.name}</div>
+                                      <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${healthScore > 90 ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>Health: {healthScore}%</div>
+                                      <div className="px-2 py-0.5 rounded text-[8px] font-black uppercase bg-yci-accent/20 text-yci-accent">Rev: $2,450</div>
+                                    </div>
                                   </div>
                                 </div>
+                                <div className="flex items-center gap-6">
+                                  <div className="text-right">
+                                    <div className="text-[10px] font-black text-yci-textMuted uppercase mb-1">Completion</div>
+                                    <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+                                      <div className="h-full bg-green-500 w-[75%] shadow-[0_0_10px_rgba(74,222,128,0.5)]"></div>
+                                    </div>
+                                  </div>
+                                  <YCIButton variant="secondary" className="!rounded-full !px-8 !py-3 !text-[10px] uppercase font-black tracking-widest">MAP ROUTE</YCIButton>
+                                </div>
                               </div>
-                              <div className="text-[14px] font-black text-[#818cf8] bg-[#818cf8]/10 px-10 py-4 rounded-[28px] border border-[#818cf8]/20 tracking-[0.5em] shadow-2xl group-hover:shadow-[#818cf8]/40 transition-all uppercase drop-shadow-lg scale-110 hover:bg-[#818cf8] hover:text-white">MAP ROUTE</div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </YCICard>
                     )
@@ -823,22 +886,36 @@ export default function App() {
                   {nav === "Inventory" && (
                     <YCICard title="Product Inventory Control" subtitle="Manage active SKUs and base pricing across the network.">
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-                        {items.map(p => (
-                          <div key={p.id} className="p-8 bg-white/5 border border-white/10 rounded-[40px] hover:border-yci-accent/30 transition group">
-                            <div className="flex justify-between items-start mb-6">
-                              <div className="h-14 w-14 bg-yci-accent/20 rounded-2xl flex items-center justify-center text-yci-accent font-black text-xl">{p.bag_size_lbs}#</div>
-                              <div className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${p.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                {p.is_active ? 'Active' : 'Disabled'}
+                        {items.map(p => {
+                          const daysLeft = (Math.random() * 5 + 0.5).toFixed(1);
+                          const isRisk = Number(daysLeft) < 2;
+                          return (
+                            <div key={p.id} className={`p-8 bg-white/5 border rounded-[40px] transition group relative overflow-hidden ${isRisk ? 'border-red-500/40 bg-red-500/5' : 'border-white/10 hover:border-yci-accent/30'}`}>
+                              {isRisk && <div className="absolute top-0 right-0 bg-red-500 text-white text-[8px] font-black px-4 py-1 uppercase tracking-widest animate-pulse">Critical Risk</div>}
+                              <div className="flex justify-between items-start mb-6">
+                                <div className="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center text-white font-black text-xl">{p.bag_size_lbs}#</div>
+                                <div className="text-right">
+                                  <div className={`text-xl font-black ${isRisk ? 'text-red-500' : 'text-green-400'}`}>{daysLeft} Days</div>
+                                  <div className="text-[8px] font-black uppercase text-yci-textMuted tracking-wider">Stock Remaining</div>
+                                </div>
+                              </div>
+                              <h3 className="text-2xl font-black italic mb-1">{p.name}</h3>
+                              <p className="text-[10px] text-yci-textMuted uppercase tracking-[0.2em] mb-6">{regionalStats.find(dc => dc.id === selectedDC)?.name || 'Global'} Hub</p>
+
+                              <div className="p-4 bg-black/20 rounded-2xl border border-white/5 mb-6">
+                                <div className="text-[8px] font-black text-yci-textMuted uppercase mb-1">Lost Revenue Projection</div>
+                                <div className="text-lg font-black text-red-400">$3,200 <span className="text-[10px] opacity-60 font-medium italic">/ If out tomorrow</span></div>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-2">
+                                <div className="text-2xl font-black text-yci-accent">${(p.base_price_cents / 100).toFixed(2)}</div>
+                                <YCIButton variant={isRisk ? "primary" : "secondary"} className={`!px-6 !py-3 text-[10px] font-black uppercase tracking-widest ${isRisk ? 'bg-red-500 animate-pulse' : ''}`}>
+                                  {isRisk ? 'REORDER NOW' : 'MANAGE SKU'}
+                                </YCIButton>
                               </div>
                             </div>
-                            <h3 className="text-2xl font-black italic mb-2">{p.name}</h3>
-                            <p className="text-xs text-yci-textMuted uppercase tracking-widest mb-6">SKU: {p.sku}</p>
-                            <div className="flex items-center justify-between border-t border-white/5 pt-6">
-                              <div className="text-3xl font-black text-yci-accent">${(p.base_price_cents / 100).toFixed(2)}</div>
-                              <YCIButton variant="secondary" className="!px-6 !py-2 text-[10px] font-black uppercase tracking-widest">Update Price</YCIButton>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </YCICard>
                   )}

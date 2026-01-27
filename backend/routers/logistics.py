@@ -74,6 +74,28 @@ def get_logistics_status(db: Session = Depends(get_db)):
             "traceback": traceback.format_exc(),
             "db_url": str(DATABASE_URL)
         }
+@router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    import os
+    import shutil
+    import uuid
+    
+    # Path relative to backend/
+    UPLOAD_DIR = "data/uploads"
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR)
+        
+    ext = file.filename.split(".")[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Return the URL that can be used to access the file
+    # In production, this would be a full URL, but here we return relative to /uploads
+    return {"url": f"/uploads/{filename}"}
+
 @router.get("/deliveries")
 def get_deliveries(dc_id: Optional[str] = None, db: Session = Depends(get_db)):
     results = []
@@ -105,7 +127,7 @@ def get_deliveries(dc_id: Optional[str] = None, db: Session = Depends(get_db)):
             "payment_method": d.payment.value if hasattr(d.payment, 'value') else str(d.payment),
             "amount_collected": d.amount_cents / 100.0,
             "driver": "Driver",
-            "proof_url": d.photo_url or "https://placehold.co/100x100?text=No+Photo",
+            "proof_url": d.photo_url if d.photo_url else "https://placehold.co/100x100?text=No+Photo",
             "notes": d.notes,
             "type": "route"
         })
@@ -128,7 +150,7 @@ def get_deliveries(dc_id: Optional[str] = None, db: Session = Depends(get_db)):
             "payment_method": o.payment_method or "unknown",
             "amount_collected": (o.total_price_cents or 0) / 100.0,
             "driver": "Driver",
-            "proof_url": "https://placehold.co/100x100?text=Direct+Sale",
+            "proof_url": o.photo_url if o.photo_url else "https://placehold.co/100x100?text=Direct+Sale",
             "notes": o.notes,
             "type": "direct"
         })

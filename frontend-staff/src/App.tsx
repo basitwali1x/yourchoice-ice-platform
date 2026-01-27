@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { YCICard, YCIButton, YCIInput } from "./components/yci/ui";
-import { login, getRoutes, submitDelivery, submitDriverDelivery, getDistributionCenters, getCustomers } from "./lib/api";
+import { login, getRoutes, submitDelivery, submitDriverDelivery, getDistributionCenters, getCustomers, uploadFile, API_URL } from "./lib/api";
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
@@ -27,8 +27,9 @@ export default function App() {
     price_20lb: 2.00, // Default based on user
     price_8lb: 1.00,
     no_tax: false,  // Tax-exempt option
-    // tax_amount removed from manual input
+    photo_url: "",
   });
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -97,11 +98,13 @@ export default function App() {
       await submitDelivery(token!, activeStop.id, {
         route_stop_id: activeStop.id,
         ...dForm,
-        amount_cents: Number(dForm.amount_cents) * 100 // convert to cents
+        amount_cents: Number(dForm.amount_cents) * 100, // convert to cents
+        photo_url: dForm.photo_url
       });
       alert("Stop Completed!");
       setView("routes");
       setActiveStop(null);
+      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0, no_tax: false, photo_url: "" });
       refreshRoutes();
     } catch (e) {
       alert("Error submitting connection (offline mode saved - logic placeholder)");
@@ -131,11 +134,12 @@ export default function App() {
         price_20lb: dForm.price_20lb,
         price_8lb: dForm.price_8lb,
         payment_method: dForm.payment,
-        no_tax: dForm.no_tax
+        no_tax: dForm.no_tax,
+        photo_url: dForm.photo_url
       });
       setReceipt(res.receipt);
       setView("receipt");
-      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0, no_tax: false });
+      setDForm({ ...dForm, delivered_20lb_qty: 0, delivered_8lb_qty: 0, no_tax: false, photo_url: "" });
       setSelectedCustomer(null);
     } catch (e) {
       console.error(e);
@@ -349,8 +353,62 @@ export default function App() {
               <YCIButton variant="ghost" onClick={() => setView("submit_delivery")}>
                 ← Back
               </YCIButton>
-              <YCIButton onClick={submitDriverForm} className="bg-green-600 hover:bg-green-700">
-                ✓ Submit Order
+              <YCIButton onClick={() => setView("photo_proof")} className="bg-green-600 hover:bg-green-700">
+                ✓ Continue to Proof
+              </YCIButton>
+            </div>
+          </div>
+        </YCICard>
+      </div>
+    );
+  }
+
+  if (view === "photo_proof") {
+    const handleFileChange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setUploading(true);
+      try {
+        const res = await uploadFile(token!, file);
+        setDForm({ ...dForm, photo_url: res.url });
+      } catch (e) {
+        alert("Upload failed");
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    return (
+      <div className="min-h-screen yci-frost-bg p-6 flex items-center justify-center">
+        <YCICard title="Proof of Delivery" subtitle="Optional photo confirmation">
+          <div className="space-y-6">
+            <div className="border-2 border-dashed border-white/20 rounded-2xl p-8 text-center bg-white/5">
+              {dForm.photo_url ? (
+                <div className="space-y-4">
+                  <img src={`${API_URL}${dForm.photo_url}`} className="w-full h-48 object-cover rounded-xl border border-white/20" alt="Proof" />
+                  <div className="text-green-400 font-bold text-xs">✓ Photo Uploaded Successfully</div>
+                  <button onClick={() => setDForm({ ...dForm, photo_url: "" })} className="text-red-400 text-[10px] uppercase font-bold tracking-widest">Remove & Retake</button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-yci-textMuted text-xs uppercase tracking-widest">Snap a photo of the delivery</div>
+                  <label className="block cursor-pointer">
+                    <div className="bg-white/10 hover:bg-white/20 transition p-6 rounded-xl flex flex-col items-center gap-2 border border-white/10">
+                      <span className="text-3xl">📸</span>
+                      <span className="text-sm font-bold">{uploading ? "Uploading..." : "Take Photo"}</span>
+                    </div>
+                    <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} disabled={uploading} />
+                  </label>
+                </div>
+              )}
+            </div>
+
+            <div className="grid gap-3">
+              <YCIButton onClick={activeStop ? submitStop : submitDriverForm} disabled={uploading}>
+                {dForm.photo_url ? "FINISH DELIVERY" : "FINISH WITHOUT PHOTO"}
+              </YCIButton>
+              <YCIButton variant="ghost" onClick={() => setView(activeStop ? "stop" : "payment_select")} disabled={uploading}>
+                ← Back
               </YCIButton>
             </div>
           </div>
@@ -416,7 +474,7 @@ export default function App() {
               <label className="text-xs text-yci-textMuted">Amount Collected ($)</label>
               <YCIInput type="number" value={dForm.amount_cents} onChange={e => setDForm({ ...dForm, amount_cents: Number(e.target.value) })} />
             </div>
-            <YCIButton onClick={submitStop}>Complete Stop</YCIButton>
+            <YCIButton onClick={() => setView("photo_proof")}>Continue to Proof</YCIButton>
           </div>
         </YCICard>
       </div>

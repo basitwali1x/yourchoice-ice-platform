@@ -32,7 +32,9 @@ def submit_delivery(stop_id: str, delivery: DeliveryCreate, db: Session = Depend
         amount_cents=delivery.amount_cents,
         check_number=delivery.check_number,
         card_last4=delivery.card_last4,
-        notes=delivery.notes
+        notes=delivery.notes,
+        photo_url=delivery.photo_url,
+        signature_url=delivery.signature_url
     )
     db.add(new_delivery)
     stop.status = "completed"
